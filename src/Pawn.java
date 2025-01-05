@@ -1,6 +1,6 @@
 public class Pawn extends Chess{
     private final int side;
-    public Pawn(int colour, int side) {
+    public Pawn(int colour, int side, ChessGame game) {
         super('P', colour);
         this.side = side;
     }
@@ -13,10 +13,11 @@ public class Pawn extends Chess{
         if (!isEmptyTile(move, board) && isOpponentPiece(move, board)) {
             return isValidCapture(move, board);
         }
-        if (move[0] == board.length - 2 || move[0] == 1) {
-            return move[1] == move[3] && side * (move[0] - move[2]) <= 2;
+        if ((move[0] == board.length - 2 || move[0] == 1) && move[1] == move[3]) {
+            return side * (move[0] - move[2]) <= 2;
+        } else {
+            return move[1] == move[3] && move[0] - move[2] == side;
         }
-        return move[1] == move[3] && move[0] - move[2] == side;
     }
 
     private boolean isValidCapture(int[] move, Chess[][] board) {

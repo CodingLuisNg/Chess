@@ -4,24 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="49cb15e4-e344-434e-85c4-25e40d1d51f1" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Chess.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Bishop.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Chess.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ChessGame.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ChessGameGUI.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ChessPlayer.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/King.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Knight.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Pawn.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Queen.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Rook.java" afterDir="false" />
+    <list default="true" id="49cb15e4-e344-434e-85c4-25e40d1d51f1" name="Changes" comment="initial commit&#10;stopped at making the main game loop ChessGame.play()">
+      <change afterPath="$PROJECT_DIR$/src/ChessGameClient.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/ChessGameServer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Chess.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Chess.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ChessGame.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ChessGame.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ChessGameGUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ChessGameGUI.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ChessPlayer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ChessPlayer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/King.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/King.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Pawn.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pawn.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Rook.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Rook.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,6 +30,21 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "CodingLuisNg"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/CodingLuisNg/Chess.git",
+    "accountId": "680b8a2f-13e6-4e0a-ae67-a24a76f19c3f"
+  }
+}]]></component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
@@ -134,11 +142,24 @@
       <option name="presentableId" value="Default" />
       <updated>1734946127472</updated>
       <workItem from="1734946128567" duration="7342000" />
-      <workItem from="1735632958968" duration="50095000" />
+      <workItem from="1735632958968" duration="67000000" />
     </task>
+    <task id="LOCAL-00001" summary="initial commit&#10;stopped at making the main game loop ChessGame.play()">
+      <option name="closed" value="true" />
+      <created>1736006557484</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1736006557484</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="initial commit&#10;stopped at making the main game loop ChessGame.play()" />
+    <option name="LAST_COMMIT_MESSAGE" value="initial commit&#10;stopped at making the main game loop ChessGame.play()" />
   </component>
 </project>

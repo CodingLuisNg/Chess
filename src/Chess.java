@@ -31,7 +31,7 @@ public abstract class Chess {
         return board[move[2]][move[3]].colour != colour;
     }
 
-    private boolean isPathClear(int[] move, Chess[][] board) {
+    protected boolean isPathClear(int[] move, Chess[][] board) {
         int startRow = move[0];
         int startCol = move[1];
         int endRow = move[2];

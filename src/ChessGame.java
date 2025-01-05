@@ -1,25 +1,23 @@
 public class ChessGame {
-    private final ChessPlayer[] players;
     private final ChessPlayer player;
+    private final ChessPlayer opponent;
     private final Chess[][] board;
-    private final ChessGameGUI gui;
     private static final int BOARD_SIZE = 8;
 
     public ChessGame(ChessPlayer player) {
         this.player = player;
-        this.players = new ChessPlayer[]{player, new ChessPlayer(-player.getColour())};
+        opponent = new ChessPlayer(-player.getColour(), -player.getSide());
         board = new Chess[BOARD_SIZE][BOARD_SIZE];
         initializeBoard();
-        gui = new ChessGameGUI(board, player);
-        play();
+        new ChessGameGUI(this);
     }
 
     private void initializeBoard() {
         int colour = player.getColour();
         // Place pawns
         for (int i = 0; i < BOARD_SIZE; i++) {
-            board[1][i] = new Pawn(-colour, -1);
-            board[6][i] = new Pawn(colour, 1);
+            board[1][i] = new Pawn(-colour, opponent.getSide(), this);
+            board[6][i] = new Pawn(colour, player.getSide(), this);
         }
 
         // Place other pieces
@@ -30,11 +28,15 @@ public class ChessGame {
         System.arraycopy(frontRow, 0, board[7], 0, BOARD_SIZE);
     }
 
-    private void play() {
-        boolean checkMate = false;
+    public ChessPlayer getPlayer() {
+        return player;
+    }
+
+    public Chess[][] getBoard() {
+        return board;
     }
 
     public static void main(String[] args) {
-        new ChessGame(new ChessPlayer(-1));
+        new ChessGame(new ChessPlayer(-1, 1));
     }
 }

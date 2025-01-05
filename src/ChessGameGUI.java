@@ -21,11 +21,14 @@ public class ChessGameGUI extends JPanel {
     private Chess floatingPiece = null; // The piece currently being dragged
     private int cursorX = 0, cursorY = 0; // Cursor position for floating piece
     private final Image backgroundImage;
+    private int currentPlayer;
 
-    public ChessGameGUI(Chess[][] board, ChessPlayer player) {
-        this.board = board;
+    public ChessGameGUI(ChessGame game) {
+        int playerColour = game.getPlayer().getColour();
+        currentPlayer = 1;
+        this.board = game.getBoard();
         loadImages();
-        if (player.getColour() == 1) {
+        if (playerColour == 1) {
             backgroundImage = new ImageIcon("src/whiteBoard.jpg").getImage();
         } else {
             backgroundImage = new ImageIcon("src/blackBoard.jpg").getImage();
@@ -38,7 +41,7 @@ public class ChessGameGUI extends JPanel {
                 int row = (e.getY() - verticalMargin) / tileSize;
                 int col = (e.getX() - horizontalMargin) / tileSize;
 
-                if (!isValidTile(row, col)) {
+                if (!isValidTile(row, col) || notPlayerSide(row, col)) {
                     return; // Ignore clicks outside the board
                 }
 
@@ -60,10 +63,19 @@ public class ChessGameGUI extends JPanel {
 
                     // Place the piece on the new tile if within bounds
                     if (isValidTile(row, col) && floatingPiece.checkMove(new int[] {selectedRow, selectedCol, row, col}, board)) {
-                        if (board[row][col] != null && board[row][col].type == 'K') {
-                            System.out.println("Checkmate");
+                        if (row != selectedRow || col != selectedCol) {
+                            currentPlayer *= -1;
                         }
-                        board[row][col] = floatingPiece;
+                        if (board[row][col] != null && board[row][col].type == 'K') {
+                            board[row][col] = floatingPiece;
+                            checkmate();
+                        } else if (floatingPiece.type == 'P' && (row == 0 || row == board.length - 1)) {
+                            promotion(row, col, floatingPiece.colour);
+                        } else if (board[row][col] != null && floatingPiece.type == 'K' && floatingPiece.colour == board[row][col].colour) {
+                            castling(row, col);
+                        } else {
+                            board[row][col] = floatingPiece;
+                        }
                     } else {
                         // Return the piece to its original position if dropped out of bounds
                         board[selectedRow][selectedCol] = floatingPiece;
@@ -179,5 +191,71 @@ public class ChessGameGUI extends JPanel {
 
     private int getSquareSize() {
         return tileSize * BOARD_SIZE;
+    }
+
+    private void promotion(int row, int col, int playerColour) {
+        // Available promotion options
+        String[] options = {"Queen", "Rook", "Knight", "Bishop"};
+        ImageIcon[] icons = {
+                new ImageIcon(pieceImages.get((playerColour == 1 ? "wQ" : "bQ"))),
+                new ImageIcon(pieceImages.get((playerColour == 1 ? "wR" : "bR"))),
+                new ImageIcon(pieceImages.get((playerColour == 1 ? "wN" : "bN"))),
+                new ImageIcon(pieceImages.get((playerColour == 1 ? "wB" : "bB")))
+        };
+
+        // Display a dialog for the user to choose a piece
+        int choice = JOptionPane.showOptionDialog(
+                null,
+                "Choose a piece for promotion:",
+                "Pawn Promotion",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                icons,
+                icons[0]
+        );
+
+        // Handle invalid choice or close dialog
+        if (choice < 0) {
+            choice = 0; // Default to Queen
+        }
+
+        // Replace pawn with the chosen piece
+        switch (options[choice]) {
+            case "Queen" -> board[row][col] = new Queen(playerColour);
+            case "Rook" -> board[row][col] = new Rook(playerColour);
+            case "Knight" -> board[row][col] = new Knight(playerColour);
+            case "Bishop" -> board[row][col] = new Bishop(playerColour);
+        }
+    }
+
+    private void checkmate() {
+        String colour;
+        if (floatingPiece.colour == 1) {
+            colour = "white";
+        } else {
+            colour = "black";
+        }
+        floatingPiece = null;
+        repaint();
+        JOptionPane.showMessageDialog(ChessGameGUI.this, colour + " Won The Game", "CHECK MATE", JOptionPane.INFORMATION_MESSAGE, null);
+    }
+
+    private void castling(int row, int col) {
+        int new_col;
+        if (selectedCol < col) {
+            new_col = selectedCol + 1;
+            selectedCol += 2;
+        } else {
+            new_col = selectedCol - 1;
+            selectedCol -= 2;
+        }
+        board[selectedRow][selectedCol] = floatingPiece;
+        board[row][new_col] = board[row][col];
+        board[row][col] = null;
+    }
+
+    private boolean notPlayerSide(int row, int col) {
+        return board[row][col].colour != currentPlayer;
     }
 }
