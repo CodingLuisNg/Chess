@@ -1,15 +1,16 @@
-public class ChessGame {
-    private final ChessPlayer player;
-    private final ChessPlayer opponent;
-    private final Chess[][] board;
-    private static final int BOARD_SIZE = 8;
+import java.io.IOException;
 
-    public ChessGame(ChessPlayer player) {
-        this.player = player;
-        opponent = new ChessPlayer(-player.getColour(), -player.getSide());
-        board = new Chess[BOARD_SIZE][BOARD_SIZE];
-        initializeBoard();
-        new ChessGameGUI(this);
+public class ChessGame {
+    private ChessPlayer player;
+    private ChessPlayer opponent;
+    private Chess[][] board;
+    public static final int BOARD_SIZE = 8;
+    private final ChessGameClient client;
+    private ChessGameGUI gui;
+    public int currentPlayer = 1;
+
+    public ChessGame() throws IOException {
+        client = new ChessGameClient(this);
     }
 
     private void initializeBoard() {
@@ -32,11 +33,66 @@ public class ChessGame {
         return player;
     }
 
+    public void setPlayer(int playerID) {
+        player = new ChessPlayer(playerID, 1);
+    }
+
     public Chess[][] getBoard() {
         return board;
     }
 
-    public static void main(String[] args) {
-        new ChessGame(new ChessPlayer(-1, 1));
+    public void makeMove(int playerID, int selectedRow, int selectedCol, int row, int col) {
+        Chess floatingPiece;
+        if (playerID == player.getColour()) {
+            floatingPiece = gui.getFloatingPiece();
+        } else {
+            floatingPiece = board[selectedRow][selectedCol];
+            board[selectedRow][selectedCol] = null;
+        }
+        currentPlayer *= -1;
+        if (board[row][col] != null && board[row][col].type == 'K') {
+            board[row][col] = floatingPiece;
+            client.sendCheckMate();
+        } else if (floatingPiece.type == 'P' && (row == 0 || row == board.length - 1)) {
+            gui.promotion(row, col, floatingPiece.colour);
+        } else if (board[row][col] != null && floatingPiece.type == 'K' && floatingPiece.colour == board[row][col].colour) {
+            castling(selectedRow, selectedCol, row, col, floatingPiece);
+        } else {
+            board[row][col] = floatingPiece;
+        }
+    }
+
+    private void castling(int selectedRow, int selectedCol, int row, int col, Chess floatingPiece) {
+        int new_col;
+        if (selectedCol < col) {
+            new_col = selectedCol + 1;
+            selectedCol += 2;
+        } else {
+            new_col = selectedCol - 1;
+            selectedCol -= 2;
+        }
+        board[selectedRow][selectedCol] = floatingPiece;
+        board[row][new_col] = board[row][col];
+        board[row][col] = null;
+    }
+
+    public void start(int playerID) {
+        setPlayer(playerID);
+        opponent = new ChessPlayer(-player.getColour(), -1);
+        board = new Chess[BOARD_SIZE][BOARD_SIZE];
+        initializeBoard();
+        gui = new ChessGameGUI(this);
+    }
+
+    public static void main(String[] args) throws IOException {
+        new ChessGame();
+    }
+
+    public ChessGameGUI getGUI() {
+        return gui;
+    }
+
+    public ChessGameClient getClient() {
+        return client;
     }
 }

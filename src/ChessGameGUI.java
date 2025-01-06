@@ -21,17 +21,15 @@ public class ChessGameGUI extends JPanel {
     private Chess floatingPiece = null; // The piece currently being dragged
     private int cursorX = 0, cursorY = 0; // Cursor position for floating piece
     private final Image backgroundImage;
-    private int currentPlayer;
 
     public ChessGameGUI(ChessGame game) {
         int playerColour = game.getPlayer().getColour();
-        currentPlayer = 1;
         this.board = game.getBoard();
         loadImages();
         if (playerColour == 1) {
-            backgroundImage = new ImageIcon("src/whiteBoard.jpg").getImage();
+            backgroundImage = new ImageIcon("whiteBoard.jpg").getImage();
         } else {
-            backgroundImage = new ImageIcon("src/blackBoard.jpg").getImage();
+            backgroundImage = new ImageIcon("blackBoard.jpg").getImage();
         }
 
         // Mouse listener for handling clicks
@@ -41,7 +39,7 @@ public class ChessGameGUI extends JPanel {
                 int row = (e.getY() - verticalMargin) / tileSize;
                 int col = (e.getX() - horizontalMargin) / tileSize;
 
-                if (!isValidTile(row, col) || notPlayerSide(row, col)) {
+                if (!isValidTile(row, col) || board[row][col] == null || game.currentPlayer != playerColour || board[row][col].colour != playerColour) {
                     return; // Ignore clicks outside the board
                 }
 
@@ -60,27 +58,13 @@ public class ChessGameGUI extends JPanel {
                 if (pieceSelected) {
                     int row = (e.getY() - verticalMargin) / tileSize;
                     int col = (e.getX() - horizontalMargin) / tileSize;
-
                     // Place the piece on the new tile if within bounds
-                    if (isValidTile(row, col) && floatingPiece.checkMove(new int[] {selectedRow, selectedCol, row, col}, board)) {
-                        if (row != selectedRow || col != selectedCol) {
-                            currentPlayer *= -1;
-                        }
-                        if (board[row][col] != null && board[row][col].type == 'K') {
-                            board[row][col] = floatingPiece;
-                            checkmate();
-                        } else if (floatingPiece.type == 'P' && (row == 0 || row == board.length - 1)) {
-                            promotion(row, col, floatingPiece.colour);
-                        } else if (board[row][col] != null && floatingPiece.type == 'K' && floatingPiece.colour == board[row][col].colour) {
-                            castling(row, col);
-                        } else {
-                            board[row][col] = floatingPiece;
-                        }
+                    if (isValidTile(row, col) && floatingPiece.checkMove(new int[] {selectedRow, selectedCol, row, col}, board) && (selectedRow != row || selectedCol != col)) {
+                        game.makeMove(playerColour, selectedRow, selectedCol, row, col);
+                        game.getClient().sendMove(new int[] {selectedRow, selectedCol, row, col});
                     } else {
-                        // Return the piece to its original position if dropped out of bounds
                         board[selectedRow][selectedCol] = floatingPiece;
                     }
-
                     // Reset temporary variables
                     floatingPiece = null;
                     pieceSelected = false;
@@ -118,7 +102,7 @@ public class ChessGameGUI extends JPanel {
     private void loadImages() {
         String[] pieces = {"wP", "wR", "wN", "wB", "wQ", "wK", "bP", "bR", "bN", "bB", "bQ", "bK"};
         for (String piece : pieces) {
-            pieceImages.put(piece, new ImageIcon("src/pieces/" + piece + ".png").getImage());
+            pieceImages.put(piece, new ImageIcon("pieces/" + piece + ".png").getImage());
         }
     }
 
@@ -185,7 +169,7 @@ public class ChessGameGUI extends JPanel {
         return row * tileSize + pieceMargin + verticalMargin;
     }
 
-    private boolean isValidTile(int row, int col) {
+    public boolean isValidTile(int row, int col) {
         return row >= 0 && row < BOARD_SIZE && col >= 0 && col < BOARD_SIZE;
     }
 
@@ -193,7 +177,7 @@ public class ChessGameGUI extends JPanel {
         return tileSize * BOARD_SIZE;
     }
 
-    private void promotion(int row, int col, int playerColour) {
+    public void promotion(int row, int col, int playerColour) {
         // Available promotion options
         String[] options = {"Queen", "Rook", "Knight", "Bishop"};
         ImageIcon[] icons = {
@@ -229,33 +213,19 @@ public class ChessGameGUI extends JPanel {
         }
     }
 
-    private void checkmate() {
+    public void checkmate(int playerID) {
         String colour;
-        if (floatingPiece.colour == 1) {
-            colour = "white";
+        if (playerID == 1) {
+            colour = "White";
         } else {
-            colour = "black";
+            colour = "Black";
         }
         floatingPiece = null;
         repaint();
-        JOptionPane.showMessageDialog(ChessGameGUI.this, colour + " Won The Game", "CHECK MATE", JOptionPane.INFORMATION_MESSAGE, null);
+        JOptionPane.showMessageDialog(this, colour + " Won The Game", "CHECK MATE", JOptionPane.INFORMATION_MESSAGE, null);
     }
 
-    private void castling(int row, int col) {
-        int new_col;
-        if (selectedCol < col) {
-            new_col = selectedCol + 1;
-            selectedCol += 2;
-        } else {
-            new_col = selectedCol - 1;
-            selectedCol -= 2;
-        }
-        board[selectedRow][selectedCol] = floatingPiece;
-        board[row][new_col] = board[row][col];
-        board[row][col] = null;
-    }
-
-    private boolean notPlayerSide(int row, int col) {
-        return board[row][col].colour != currentPlayer;
+    public Chess getFloatingPiece() {
+        return floatingPiece;
     }
 }
