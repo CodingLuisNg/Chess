@@ -21,15 +21,17 @@ public class ChessGameGUI extends JPanel {
     private Chess floatingPiece = null; // The piece currently being dragged
     private int cursorX = 0, cursorY = 0; // Cursor position for floating piece
     private final Image backgroundImage;
+    private Image premove;
+    private final int playerColour;
 
     public ChessGameGUI(ChessGame game) {
-        int playerColour = game.getPlayer().getColour();
+        playerColour = game.getPlayer().getColour();
         this.board = game.getBoard();
         loadImages();
         if (playerColour == 1) {
-            backgroundImage = new ImageIcon("whiteBoard.jpg").getImage();
+            backgroundImage = new ImageIcon("resources/whiteBoard.png").getImage();
         } else {
-            backgroundImage = new ImageIcon("blackBoard.jpg").getImage();
+            backgroundImage = new ImageIcon("resources/blackBoard.png").getImage();
         }
 
         // Mouse listener for handling clicks
@@ -44,6 +46,7 @@ public class ChessGameGUI extends JPanel {
                 }
 
                 if (isValidTile(row, col) && board[row][col] != null) {
+                    SoundPlayer.playSound("resources/Select.wav");
                     // Select a piece to move
                     selectedRow = row;
                     selectedCol = col;
@@ -102,8 +105,9 @@ public class ChessGameGUI extends JPanel {
     private void loadImages() {
         String[] pieces = {"wP", "wR", "wN", "wB", "wQ", "wK", "bP", "bR", "bN", "bB", "bQ", "bK"};
         for (String piece : pieces) {
-            pieceImages.put(piece, new ImageIcon("pieces/" + piece + ".png").getImage());
+            pieceImages.put(piece, new ImageIcon("resources/pieces/" + piece + ".png").getImage());
         }
+        premove = new ImageIcon("resources/premove.png").getImage();
     }
 
     @Override
@@ -138,10 +142,18 @@ public class ChessGameGUI extends JPanel {
                     if (img != null) {
                         g.drawImage(img, getTileX(col), getTileY(row), pieceSize, pieceSize, this);
                     }
+                    if (piece.colour != playerColour) {
+                        if (floatingPiece != null && floatingPiece.checkMove(new int[] {selectedRow, selectedCol, row, col}, board)) {
+                            g.drawImage(premove, getTileX(col) + pieceSize / 4, getTileY(row) + pieceSize / 4, pieceSize / 2, pieceSize / 2, this);
+                        }
+                    }
+                } else if (floatingPiece != null && floatingPiece.checkMove(new int[] {selectedRow, selectedCol, row, col}, board) && (selectedRow != row || selectedCol != col)) {
+                    g.drawImage(premove, getTileX(col) + pieceSize / 4, getTileY(row) + pieceSize / 4, pieceSize / 2, pieceSize / 2, this);
                 }
             }
         }
     }
+
 
     private void adjustDimensions() {
         int width = getWidth();

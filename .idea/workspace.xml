@@ -4,15 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="49cb15e4-e344-434e-85c4-25e40d1d51f1" name="Changes" comment="finished single player game logic and GUI&#10;left finishing&#10;ChessGameServer and ChessGameClient">
-      <change afterPath="$PROJECT_DIR$/src/ChessMessage.java" afterDir="false" />
+    <list default="true" id="49cb15e4-e344-434e-85c4-25e40d1d51f1" name="Changes" comment="Completed ChessGameServer and ChessGameClient&#10;The game can now be played through network">
+      <change afterPath="$PROJECT_DIR$/src/SoundPlayer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ChessGame.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ChessGame.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ChessGameClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ChessGameClient.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ChessGameGUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ChessGameGUI.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ChessGameServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ChessGameServer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Knight.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Knight.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ChessMessage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ChessMessage.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,18 +28,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "CodingLuisNg"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;CodingLuisNg&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/CodingLuisNg/Chess.git",
-    "accountId": "680b8a2f-13e6-4e0a-ae67-a24a76f19c3f"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/CodingLuisNg/Chess.git&quot;,
+    &quot;accountId&quot;: &quot;680b8a2f-13e6-4e0a-ae67-a24a76f19c3f&quot;
   }
-}]]></component>
+}</component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
   </component>
@@ -53,32 +52,32 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.ChessBoardGUI.executor": "Run",
-    "Application.ChessGame.executor": "Run",
-    "Application.ChessGameGUI.executor": "Run",
-    "Application.ChessGameServer.executor": "Run",
-    "Application.ChessPiecesDisplay.executor": "Run",
-    "Application.Main.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
-    "kotlin-language-version-configured": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.lookFeel",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.ChessBoardGUI.executor&quot;: &quot;Run&quot;,
+    &quot;Application.ChessGame.executor&quot;: &quot;Run&quot;,
+    &quot;Application.ChessGameGUI.executor&quot;: &quot;Run&quot;,
+    &quot;Application.ChessGameServer.executor&quot;: &quot;Run&quot;,
+    &quot;Application.ChessPiecesDisplay.executor&quot;: &quot;Run&quot;,
+    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
       <recent name="" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.ChessGame">
+  <component name="RunManager" selected="Application.ChessGameServer">
     <configuration name="ChessGame" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="ChessGame" />
       <module name="Chess" />
@@ -141,7 +140,12 @@
       <option name="presentableId" value="Default" />
       <updated>1734946127472</updated>
       <workItem from="1734946128567" duration="7342000" />
-      <workItem from="1735632958968" duration="86084000" />
+      <workItem from="1735632958968" duration="91520000" />
+      <workItem from="1737442657004" duration="12387000" />
+      <workItem from="1737646551949" duration="39000" />
+      <workItem from="1737690212559" duration="44247000" />
+      <workItem from="1738401332211" duration="1724000" />
+      <workItem from="1741103070681" duration="6324000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit&#10;stopped at making the main game loop ChessGame.play()">
       <option name="closed" value="true" />
@@ -159,15 +163,35 @@
       <option name="project" value="LOCAL" />
       <updated>1736088213326</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Completed ChessGameServer and ChessGameClient&#10;The game can now be played through network">
+      <option name="closed" value="true" />
+      <created>1736154480999</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1736154480999</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="initial commit&#10;stopped at making the main game loop ChessGame.play()" />
     <MESSAGE value="finished single player game logic and GUI&#10;left finishing&#10;ChessGameServer and ChessGameClient" />
-    <option name="LAST_COMMIT_MESSAGE" value="finished single player game logic and GUI&#10;left finishing&#10;ChessGameServer and ChessGameClient" />
+    <MESSAGE value="Completed ChessGameServer and ChessGameClient&#10;The game can now be played through network" />
+    <option name="LAST_COMMIT_MESSAGE" value="Completed ChessGameServer and ChessGameClient&#10;The game can now be played through network" />
   </component>
 </project>

@@ -5,7 +5,7 @@ public class ChessGame {
     private ChessPlayer opponent;
     private Chess[][] board;
     public static final int BOARD_SIZE = 8;
-    private final ChessGameClient client;
+    private ChessGameClient client;
     private ChessGameGUI gui;
     public int currentPlayer = 1;
 
@@ -50,6 +50,11 @@ public class ChessGame {
             board[selectedRow][selectedCol] = null;
         }
         currentPlayer *= -1;
+        if (board[row][col] == null) {
+            SoundPlayer.playSound("resources/Move.wav");
+        } else {
+            SoundPlayer.playSound("resources/Capture.wav");
+        }
         if (board[row][col] != null && board[row][col].type == 'K') {
             board[row][col] = floatingPiece;
             client.sendCheckMate();
@@ -94,5 +99,9 @@ public class ChessGame {
 
     public ChessGameClient getClient() {
         return client;
+    }
+
+    public void reset() throws IOException {
+        client = new ChessGameClient(this);
     }
 }

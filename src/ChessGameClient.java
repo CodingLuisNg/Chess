@@ -1,36 +1,63 @@
+import javax.swing.*;
 import java.io.*;
 import java.net.*;
 
 public class ChessGameClient {
-    private static final String SERVER_ADDRESS = "192.168.0.181";
+    private static String SERVER_ADDRESS;
     private static final int SERVER_PORT = 12345;
     private int playerID;
     private ObjectOutputStream oos;
     private ObjectInputStream ois;
     private final ChessGame game;
+    private Socket socket;
+    private boolean connected = false;
 
     public ChessGameClient(ChessGame game) throws IOException {
         this.game = game;
+        SERVER_ADDRESS = JOptionPane.showInputDialog(null, "Input the server IP address", "localhost");
         connect();
         new Thread(this::listenForMessages).start();
     }
 
     private void connect() throws IOException {
-        Socket socket = new Socket(SERVER_ADDRESS, SERVER_PORT);
+        socket = new Socket(SERVER_ADDRESS, SERVER_PORT);
         oos = new ObjectOutputStream(socket.getOutputStream());
         ois = new ObjectInputStream(socket.getInputStream());
+        connected = true;
         System.out.println("Connected to the server.");
+    }
+
+    private void disconnect() {
+        connected = false;
+        try {
+            if (oos != null) oos.close();
+            if (ois != null) ois.close();
+            if (socket != null) socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void listenForMessages() {
         try {
-            while (true) {
+            while (connected) {
                 ChessMessage message = (ChessMessage) ois.readObject();
                 processMessage(message);
             }
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+            handleDisconnection();
         }
+    }
+
+    private void handleDisconnection() {
+        disconnect();
+        SwingUtilities.invokeLater(() -> {
+            JOptionPane.showMessageDialog(null,
+                    "Lost connection to the server. Please restart the game.",
+                    "Connection Lost",
+                    JOptionPane.ERROR_MESSAGE);
+            System.exit(0);
+        });
     }
 
     private void processMessage(ChessMessage message) {
@@ -42,30 +69,57 @@ public class ChessGameClient {
             }
             case ChessMessage.MOVE -> {
                 int[] move = (int[]) message.data();
-                System.out.println("Player " + message.playerID() + " Move " + (ChessGame.BOARD_SIZE - move[0] - 1) + " " + move[1] + " " + (ChessGame.BOARD_SIZE - move[2] - 1) + " " + move[3]);
-                game.makeMove(message.playerID(), ChessGame.BOARD_SIZE - move[0] - 1, move[1], ChessGame.BOARD_SIZE - move[2] - 1, move[3]);
+                game.makeMove(message.playerID(), ChessGame.BOARD_SIZE - move[0] - 1, move[1],
+                        ChessGame.BOARD_SIZE - move[2] - 1, move[3]);
                 game.getGUI().repaint();
             }
-            case ChessMessage.CHECKMATE -> {
-                game.getGUI().checkmate((int) message.data());
-                // Handle end game logic
-            }
+            case ChessMessage.CHECKMATE -> game.getGUI().checkmate((int) message.data());
+            case ChessMessage.QUIT -> handleOpponentDisconnection();
         }
+    }
+
+    private void handleOpponentDisconnection() {
+        SwingUtilities.invokeLater(() -> {
+            int option = JOptionPane.showOptionDialog(null,
+                    "Your opponent has disconnected. Would you like to wait for a new opponent?",
+                    "Opponent Disconnected",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    new String[]{"Wait for new opponent", "Exit game"},
+                    "Wait for new opponent");
+
+            if (option == JOptionPane.NO_OPTION) {
+                disconnect();
+                System.exit(0);
+            } else {
+                // Reset the game board and wait for new opponent
+                try {
+                    game.reset();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
 
     public void sendMove(int[] move) {
         try {
-            oos.writeObject(new ChessMessage(ChessMessage.MOVE, playerID, move));
+            if (connected) {
+                oos.writeObject(new ChessMessage(ChessMessage.MOVE, playerID, move));
+            }
         } catch (IOException e) {
-            e.printStackTrace();
+            handleDisconnection();
         }
     }
 
     public void sendCheckMate() {
         try {
-            oos.writeObject(new ChessMessage(ChessMessage.CHECKMATE, 0, playerID));
+            if (connected) {
+                oos.writeObject(new ChessMessage(ChessMessage.CHECKMATE, 0, playerID));
+            }
         } catch (IOException e) {
-            e.printStackTrace();
+            handleDisconnection();
         }
     }
 }
