@@ -21,17 +21,18 @@ public class ChessGameGUI extends JPanel {
     private Chess floatingPiece = null; // The piece currently being dragged
     private int cursorX = 0, cursorY = 0; // Cursor position for floating piece
     private final Image backgroundImage;
-    private Image premove;
     private final int playerColour;
+    private final ChessGame game;
 
     public ChessGameGUI(ChessGame game) {
+        this.game = game;
         playerColour = game.getPlayer().getColour();
         this.board = game.getBoard();
         loadImages();
         if (playerColour == 1) {
-            backgroundImage = new ImageIcon("resources/whiteBoard.png").getImage();
+            backgroundImage = new ImageIcon(getClass().getResource("/whiteBoard.png")).getImage();
         } else {
-            backgroundImage = new ImageIcon("resources/blackBoard.png").getImage();
+            backgroundImage = new ImageIcon(getClass().getResource("/blackBoard.png")).getImage();
         }
 
         // Mouse listener for handling clicks
@@ -46,7 +47,7 @@ public class ChessGameGUI extends JPanel {
                 }
 
                 if (isValidTile(row, col) && board[row][col] != null) {
-                    SoundPlayer.playSound("resources/Select.wav");
+                    SoundPlayer.playSound("/Select.wav");
                     // Select a piece to move
                     selectedRow = row;
                     selectedCol = col;
@@ -64,7 +65,7 @@ public class ChessGameGUI extends JPanel {
                     // Place the piece on the new tile if within bounds
                     if (isValidTile(row, col) && floatingPiece.checkMove(new int[] {selectedRow, selectedCol, row, col}, board) && (selectedRow != row || selectedCol != col)) {
                         game.makeMove(playerColour, selectedRow, selectedCol, row, col);
-                        game.getClient().sendMove(new int[] {selectedRow, selectedCol, row, col});
+                        game.getClient().sendMove(ChessMessage.MOVE, new int[] {selectedRow, selectedCol, row, col});
                     } else {
                         board[selectedRow][selectedCol] = floatingPiece;
                     }
@@ -105,9 +106,8 @@ public class ChessGameGUI extends JPanel {
     private void loadImages() {
         String[] pieces = {"wP", "wR", "wN", "wB", "wQ", "wK", "bP", "bR", "bN", "bB", "bQ", "bK"};
         for (String piece : pieces) {
-            pieceImages.put(piece, new ImageIcon("resources/pieces/" + piece + ".png").getImage());
+            pieceImages.put(piece, new ImageIcon(getClass().getResource("/pieces/" + piece + ".png")).getImage());
         }
-        premove = new ImageIcon("resources/premove.png").getImage();
     }
 
     @Override
@@ -142,13 +142,6 @@ public class ChessGameGUI extends JPanel {
                     if (img != null) {
                         g.drawImage(img, getTileX(col), getTileY(row), pieceSize, pieceSize, this);
                     }
-                    if (piece.colour != playerColour) {
-                        if (floatingPiece != null && floatingPiece.checkMove(new int[] {selectedRow, selectedCol, row, col}, board)) {
-                            g.drawImage(premove, getTileX(col) + pieceSize / 4, getTileY(row) + pieceSize / 4, pieceSize / 2, pieceSize / 2, this);
-                        }
-                    }
-                } else if (floatingPiece != null && floatingPiece.checkMove(new int[] {selectedRow, selectedCol, row, col}, board) && (selectedRow != row || selectedCol != col)) {
-                    g.drawImage(premove, getTileX(col) + pieceSize / 4, getTileY(row) + pieceSize / 4, pieceSize / 2, pieceSize / 2, this);
                 }
             }
         }
@@ -215,14 +208,24 @@ public class ChessGameGUI extends JPanel {
         if (choice < 0) {
             choice = 0; // Default to Queen
         }
-
+        int piece = 4;
         // Replace pawn with the chosen piece
         switch (options[choice]) {
             case "Queen" -> board[row][col] = new Queen(playerColour);
-            case "Rook" -> board[row][col] = new Rook(playerColour);
-            case "Knight" -> board[row][col] = new Knight(playerColour);
-            case "Bishop" -> board[row][col] = new Bishop(playerColour);
+            case "Rook" -> {
+                board[row][col] = new Rook(playerColour);
+                piece = 3;
+            }
+            case "Knight" -> {
+                board[row][col] = new Knight(playerColour);
+                piece = 1;
+            }
+            case "Bishop" -> {
+                board[row][col] = new Bishop(playerColour);
+                piece = 2;
+            }
         }
+        game.getClient().sendMove(ChessMessage.PLACE, new int[] {1, piece, row, col});
     }
 
     public void checkmate(int playerID) {

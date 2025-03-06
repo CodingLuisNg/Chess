@@ -8,13 +8,14 @@ public class ChessGame {
     private ChessGameClient client;
     private ChessGameGUI gui;
     public int currentPlayer = 1;
+    private int colour;
 
     public ChessGame() throws IOException {
         client = new ChessGameClient(this);
     }
 
     private void initializeBoard() {
-        int colour = player.getColour();
+        colour = player.getColour();
         // Place pawns
         for (int i = 0; i < BOARD_SIZE; i++) {
             board[1][i] = new Pawn(-colour, opponent.getSide(), this);
@@ -51,14 +52,14 @@ public class ChessGame {
         }
         currentPlayer *= -1;
         if (board[row][col] == null) {
-            SoundPlayer.playSound("resources/Move.wav");
+            SoundPlayer.playSound("/Move.wav");
         } else {
-            SoundPlayer.playSound("resources/Capture.wav");
+            SoundPlayer.playSound("/Capture.wav");
         }
         if (board[row][col] != null && board[row][col].type == 'K') {
             board[row][col] = floatingPiece;
             client.sendCheckMate();
-        } else if (floatingPiece.type == 'P' && (row == 0 || row == board.length - 1)) {
+        } else if (floatingPiece.colour == colour && floatingPiece.type == 'P' && (row == 0 || row == board.length - 1)) {
             gui.promotion(row, col, floatingPiece.colour);
         } else if (board[row][col] != null && floatingPiece.type == 'K' && floatingPiece.colour == board[row][col].colour) {
             castling(selectedRow, selectedCol, row, col, floatingPiece);

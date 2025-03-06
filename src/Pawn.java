@@ -14,7 +14,7 @@ public class Pawn extends Chess{
             return isValidCapture(move, board);
         }
         if ((move[0] == board.length - 2 || move[0] == 1) && move[1] == move[3]) {
-            return side * (move[0] - move[2]) <= 2;
+            return side * (move[0] - move[2]) == 1 || side * (move[0] - move[2]) == 2;
         } else {
             return move[1] == move[3] && move[0] - move[2] == side;
         }

@@ -4,7 +4,7 @@ import java.net.*;
 
 public class ChessGameClient {
     private static String SERVER_ADDRESS;
-    private static final int SERVER_PORT = 12345;
+    private static int SERVER_PORT;
     private int playerID;
     private ObjectOutputStream oos;
     private ObjectInputStream ois;
@@ -15,6 +15,8 @@ public class ChessGameClient {
     public ChessGameClient(ChessGame game) throws IOException {
         this.game = game;
         SERVER_ADDRESS = JOptionPane.showInputDialog(null, "Input the server IP address", "localhost");
+        String portInput = JOptionPane.showInputDialog(null, "Input the server port", "2396");
+        SERVER_PORT = Integer.parseInt(portInput);
         connect();
         new Thread(this::listenForMessages).start();
     }
@@ -75,6 +77,22 @@ public class ChessGameClient {
             }
             case ChessMessage.CHECKMATE -> game.getGUI().checkmate((int) message.data());
             case ChessMessage.QUIT -> handleOpponentDisconnection();
+            case ChessMessage.PLACE -> {
+                int[] move = (int[]) message.data();
+                Chess piece;
+                switch (move[1]) {
+                    case 2 -> piece = new Bishop(playerID);
+                    case 1 -> piece = new Knight(playerID);
+                    case 3 -> piece = new Rook(playerID);
+                    default -> piece = new Queen(playerID);
+                }
+                if (move[0] == 1) {
+                    game.getBoard()[move[2]][move[3]] = piece;
+                } else {
+                    game.getBoard()[move[2]][move[3]] = null;
+                }
+
+            }
         }
     }
 
@@ -103,10 +121,10 @@ public class ChessGameClient {
         });
     }
 
-    public void sendMove(int[] move) {
+    public void sendMove(int type, int[] move) {
         try {
             if (connected) {
-                oos.writeObject(new ChessMessage(ChessMessage.MOVE, playerID, move));
+                oos.writeObject(new ChessMessage(type, playerID, move));
             }
         } catch (IOException e) {
             handleDisconnection();

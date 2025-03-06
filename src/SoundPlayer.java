@@ -1,13 +1,15 @@
 import javax.sound.sampled.*;
-import java.io.File;
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class SoundPlayer {
-    public static void playSound(String filePath) {
+    public static void playSound(String resourcePath) {
         new Thread(() -> {
-            try {
-                File soundFile = new File(filePath);
-                AudioInputStream audioStream = AudioSystem.getAudioInputStream(soundFile);
+            try (InputStream audioSrc = SoundPlayer.class.getResourceAsStream(resourcePath);
+                 BufferedInputStream bufferedIn = new BufferedInputStream(audioSrc);
+                 AudioInputStream audioStream = AudioSystem.getAudioInputStream(bufferedIn)) {
+
                 Clip clip = AudioSystem.getClip();
                 clip.open(audioStream);
                 clip.start();
@@ -16,11 +18,6 @@ public class SoundPlayer {
                 clip.addLineListener(event -> {
                     if (event.getType() == LineEvent.Type.STOP) {
                         clip.close();
-                        try {
-                            audioStream.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
                     }
                 });
 

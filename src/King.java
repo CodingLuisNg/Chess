@@ -4,6 +4,10 @@ public class King extends Chess{
         super('K', colour);
     }
 
+    public boolean canCastle() {
+        return canCastle;
+    }
+
     @Override
     public boolean checkMove(int[] move, Chess[][] board) {
         if (board[move[2]][move[3]] instanceof Rook && ((Rook) board[move[2]][move[3]]).canCastle() && board[move[2]][move[3]].colour == colour && canCastle && isPathClear(move, board)) {
