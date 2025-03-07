@@ -63,6 +63,8 @@ public class ChessGameClient {
     }
 
     private void processMessage(ChessMessage message) {
+        System.out.println("Message received: " + message.type() + ' ' + message.data().toString());
+
         switch (message.type()) {
             case ChessMessage.START -> {
                 playerID = (int) message.data();
@@ -81,17 +83,17 @@ public class ChessGameClient {
                 int[] move = (int[]) message.data();
                 Chess piece;
                 switch (move[1]) {
-                    case 2 -> piece = new Bishop(playerID);
-                    case 1 -> piece = new Knight(playerID);
-                    case 3 -> piece = new Rook(playerID);
-                    default -> piece = new Queen(playerID);
+                    case 2 -> piece = new Bishop(message.playerID());
+                    case 1 -> piece = new Knight(message.playerID());
+                    case 3 -> piece = new Rook(message.playerID());
+                    default -> piece = new Queen(message.playerID());
                 }
                 if (move[0] == 1) {
-                    game.getBoard()[move[2]][move[3]] = piece;
+                    game.getBoard()[game.getBoard().length - move[2] - 1][move[3]] = piece;
                 } else {
                     game.getBoard()[move[2]][move[3]] = null;
                 }
-
+                game.getGUI().repaint();
             }
         }
     }

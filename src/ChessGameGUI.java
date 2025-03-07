@@ -64,8 +64,9 @@ public class ChessGameGUI extends JPanel {
                     int col = (e.getX() - horizontalMargin) / tileSize;
                     // Place the piece on the new tile if within bounds
                     if (isValidTile(row, col) && floatingPiece.checkMove(new int[] {selectedRow, selectedCol, row, col}, board) && (selectedRow != row || selectedCol != col)) {
-                        game.makeMove(playerColour, selectedRow, selectedCol, row, col);
-                        game.getClient().sendMove(ChessMessage.MOVE, new int[] {selectedRow, selectedCol, row, col});
+                        if (game.makeMove(playerColour, selectedRow, selectedCol, row, col)) {
+                            game.getClient().sendMove(ChessMessage.MOVE, new int[] {selectedRow, selectedCol, row, col});
+                        }
                     } else {
                         board[selectedRow][selectedCol] = floatingPiece;
                     }
@@ -225,6 +226,7 @@ public class ChessGameGUI extends JPanel {
                 piece = 2;
             }
         }
+        game.getClient().sendMove(ChessMessage.MOVE, new int[] {selectedRow, selectedCol, row, col});
         game.getClient().sendMove(ChessMessage.PLACE, new int[] {1, piece, row, col});
     }
 

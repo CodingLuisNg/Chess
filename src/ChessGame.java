@@ -42,7 +42,7 @@ public class ChessGame {
         return board;
     }
 
-    public void makeMove(int playerID, int selectedRow, int selectedCol, int row, int col) {
+    public boolean makeMove(int playerID, int selectedRow, int selectedCol, int row, int col) {
         Chess floatingPiece;
         if (playerID == player.getColour()) {
             floatingPiece = gui.getFloatingPiece();
@@ -61,11 +61,13 @@ public class ChessGame {
             client.sendCheckMate();
         } else if (floatingPiece.colour == colour && floatingPiece.type == 'P' && (row == 0 || row == board.length - 1)) {
             gui.promotion(row, col, floatingPiece.colour);
+            return false;
         } else if (board[row][col] != null && floatingPiece.type == 'K' && floatingPiece.colour == board[row][col].colour) {
             castling(selectedRow, selectedCol, row, col, floatingPiece);
         } else {
             board[row][col] = floatingPiece;
         }
+        return true;
     }
 
     private void castling(int selectedRow, int selectedCol, int row, int col, Chess floatingPiece) {
