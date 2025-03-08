@@ -9,6 +9,8 @@ public class ChessGame {
     private ChessGameGUI gui;
     public int currentPlayer = 1;
     private int colour;
+    private int[] myLastMove;
+    private int[] oppLastMove;
 
     public ChessGame() throws IOException {
         client = new ChessGameClient(this);
@@ -28,6 +30,22 @@ public class ChessGame {
 
         Chess[] frontRow = {new Rook(colour), new Knight(colour), new Bishop(colour), new Queen(colour), new King(colour), new Bishop(colour), new Knight(colour), new Rook(colour)};
         System.arraycopy(frontRow, 0, board[7], 0, BOARD_SIZE);
+    }
+
+    public int[] getLastMove(boolean mine) {
+        if (mine) {
+            return myLastMove;
+        } else {
+            return oppLastMove;
+        }
+    }
+
+    public void setLastMove(boolean mine, int[] lastMove) {
+        if (mine) {
+            myLastMove = lastMove;
+        } else {
+            oppLastMove = lastMove;
+        }
     }
 
     public ChessPlayer getPlayer() {

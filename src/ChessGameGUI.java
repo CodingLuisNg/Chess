@@ -23,6 +23,8 @@ public class ChessGameGUI extends JPanel {
     private final Image backgroundImage;
     private final int playerColour;
     private final ChessGame game;
+    private Image preMoveImage;
+    private Image lastMoveImage;
 
     public ChessGameGUI(ChessGame game) {
         this.game = game;
@@ -109,6 +111,8 @@ public class ChessGameGUI extends JPanel {
         for (String piece : pieces) {
             pieceImages.put(piece, new ImageIcon(getClass().getResource("/pieces/" + piece + ".png")).getImage());
         }
+        preMoveImage = new ImageIcon(getClass().getResource("/preMove.png")).getImage();
+        lastMoveImage = new ImageIcon(getClass().getResource("/lastMove.png")).getImage();
     }
 
     @Override
