@@ -98,6 +98,7 @@ public class ChessGameGUI extends JPanel {
         JFrame frame = new JFrame("Chess Game");
         frame.setLayout(new BorderLayout());
         frame.add(this, BorderLayout.CENTER);
+        frame.add(new Graveyard(), BorderLayout.EAST);
         setPreferredSize(new Dimension(1280, 720));
         frame.pack();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -248,5 +249,9 @@ public class ChessGameGUI extends JPanel {
 
     public Chess getFloatingPiece() {
         return floatingPiece;
+    }
+
+    private class Graveyard extends JPanel {
+
     }
 }

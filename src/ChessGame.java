@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class ChessGame {
     private ChessPlayer player;
@@ -10,7 +11,8 @@ public class ChessGame {
     public int currentPlayer = 1;
     private int colour;
     private int[] myLastMove;
-    private int[] oppLastMove;
+    private int[] opponentLastMove;
+    private ArrayList<Chess> graveyard;
 
     public ChessGame() throws IOException {
         client = new ChessGameClient(this);
@@ -36,7 +38,7 @@ public class ChessGame {
         if (mine) {
             return myLastMove;
         } else {
-            return oppLastMove;
+            return opponentLastMove;
         }
     }
 
@@ -44,7 +46,7 @@ public class ChessGame {
         if (mine) {
             myLastMove = lastMove;
         } else {
-            oppLastMove = lastMove;
+            opponentLastMove = lastMove;
         }
     }
 
@@ -73,6 +75,7 @@ public class ChessGame {
             SoundPlayer.playSound("/Move.wav");
         } else {
             SoundPlayer.playSound("/Capture.wav");
+            graveyard.add(board[row][col]);
         }
         if (board[row][col] != null && board[row][col].type == 'K') {
             board[row][col] = floatingPiece;
