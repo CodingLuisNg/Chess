@@ -75,7 +75,9 @@ public class ChessGame {
             SoundPlayer.playSound("/Move.wav");
         } else {
             SoundPlayer.playSound("/Capture.wav");
-            graveyard.add(board[row][col]);
+            if (board[row][col].colour == playerID * -1) {
+                graveyard.add(board[row][col]);
+            }
         }
         if (board[row][col] != null && board[row][col].type == 'K') {
             board[row][col] = floatingPiece;
