@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -6,7 +7,7 @@ public class ChessGame {
     private ChessPlayer opponent;
     private Chess[][] board;
     public static final int BOARD_SIZE = 8;
-    private ChessGameClient client;
+    private final ChessGameClient client;
     private ChessGameGUI gui;
     public int currentPlayer = 1;
     private int colour;
@@ -15,7 +16,33 @@ public class ChessGame {
     private ArrayList<Chess> graveyard;
 
     public ChessGame() throws IOException {
-        client = new ChessGameClient(this);
+        int choice = JOptionPane.showConfirmDialog(
+                null,
+                "Do you want to host the game?",
+                "Host or Join",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (choice == JOptionPane.YES_OPTION) {
+            String portInput = JOptionPane.showInputDialog(null, "Enter the port to host the game:", "2396");
+            int port = Integer.parseInt(portInput);
+            // Start the server in a new thread
+            new Thread(() -> {
+                try {
+                    new ChessGameServer().start(port);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }).start();
+
+            // Initialize the client to connect to localhost
+            client = new ChessGameClient(this, "localhost", port);
+        } else {
+            String server_address = JOptionPane.showInputDialog(null, "Input the server IP address", "localhost");
+            String portInput = JOptionPane.showInputDialog(null, "Enter the port to of the game:", "2396");
+            int port = Integer.parseInt(portInput);
+            client = new ChessGameClient(this, server_address, port);
+        }
     }
 
     private void initializeBoard() {
@@ -127,7 +154,5 @@ public class ChessGame {
         return client;
     }
 
-    public void reset() throws IOException {
-        client = new ChessGameClient(this);
-    }
+    public void reset() {}
 }

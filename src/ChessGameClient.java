@@ -12,11 +12,10 @@ public class ChessGameClient {
     private Socket socket;
     private boolean connected = false;
 
-    public ChessGameClient(ChessGame game) throws IOException {
+    public ChessGameClient(ChessGame game, String server_address, int server_port) throws IOException {
         this.game = game;
-        SERVER_ADDRESS = JOptionPane.showInputDialog(null, "Input the server IP address", "localhost");
-        String portInput = JOptionPane.showInputDialog(null, "Input the server port", "2396");
-        SERVER_PORT = Integer.parseInt(portInput);
+        SERVER_ADDRESS = server_address;
+        SERVER_PORT = server_port;
         connect();
         new Thread(this::listenForMessages).start();
     }
@@ -114,11 +113,7 @@ public class ChessGameClient {
                 System.exit(0);
             } else {
                 // Reset the game board and wait for new opponent
-                try {
-                    game.reset();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                game.reset();
             }
         });
     }
