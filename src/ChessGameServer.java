@@ -54,6 +54,7 @@ public class ChessGameServer {
             System.out.println("Two players connected. Starting the game...");
             gameInProgress = true;
             for (PlayerHandler player : players) {
+                // Ensure the data field is an int[] (even if it's empty)
                 ChessMessage startMessage = new ChessMessage(ChessMessage.START, 0, player.playerID);
                 player.sendMessage(startMessage);
             }
@@ -158,7 +159,10 @@ public class ChessGameServer {
             try {
                 if (isConnected()) {
                     oos.writeObject(message);
-                    System.out.println("Sent message to player " + playerID + ": " + message.type() + " " + Arrays.toString((int[]) message.data()));
+                    System.out.println("Sent message to player " + playerID + ": " + message.type() +
+                            " " + (message.data() instanceof int[] ?
+                            Arrays.toString((int[]) message.data()) :
+                            message.data()));
                 }
             } catch (IOException e) {
                 connected = false;

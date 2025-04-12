@@ -2,54 +2,88 @@ import javax.swing.*;
 import java.io.*;
 import java.net.*;
 
+/**
+ * Handles network communication between chess clients.
+ */
 public class ChessGameClient {
-    private static String SERVER_ADDRESS;
-    private static int SERVER_PORT;
+    private final String serverAddress;
+    private final int serverPort;
     private int playerID;
-    private ObjectOutputStream oos;
-    private ObjectInputStream ois;
+    private ObjectOutputStream outputStream;
+    private ObjectInputStream inputStream;
     private final ChessGame game;
     private Socket socket;
     private boolean connected = false;
 
-    public ChessGameClient(ChessGame game, String server_address, int server_port) throws IOException {
+    /**
+     * Creates a client connection to the chess server.
+     */
+    public ChessGameClient(ChessGame game, String serverAddress, int serverPort) throws IOException {
         this.game = game;
-        SERVER_ADDRESS = server_address;
-        SERVER_PORT = server_port;
+        this.serverAddress = serverAddress;
+        this.serverPort = serverPort;
         connect();
+        startMessageListener();
+    }
+
+    /**
+     * Establishes connection to the server.
+     */
+    private void connect() throws IOException {
+        try {
+            socket = new Socket(serverAddress, serverPort);
+            outputStream = new ObjectOutputStream(socket.getOutputStream());
+            inputStream = new ObjectInputStream(socket.getInputStream());
+            connected = true;
+            System.out.println("Connected to the server.");
+        } catch (IOException e) {
+            System.err.println("Failed to connect to server: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    /**
+     * Starts a background thread to listen for incoming messages.
+     */
+    private void startMessageListener() {
         new Thread(this::listenForMessages).start();
     }
 
-    private void connect() throws IOException {
-        socket = new Socket(SERVER_ADDRESS, SERVER_PORT);
-        oos = new ObjectOutputStream(socket.getOutputStream());
-        ois = new ObjectInputStream(socket.getInputStream());
-        connected = true;
-        System.out.println("Connected to the server.");
-    }
-
+    /**
+     * Closes all connections safely.
+     */
     private void disconnect() {
         connected = false;
         try {
-            if (oos != null) oos.close();
-            if (ois != null) ois.close();
+            if (outputStream != null) outputStream.close();
+            if (inputStream != null) inputStream.close();
             if (socket != null) socket.close();
+            System.out.println("Disconnected from server.");
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Error during disconnect: " + e.getMessage());
         }
     }
 
+    /**
+     * Background thread that continuously listens for messages.
+     */
     private void listenForMessages() {
         try {
             while (connected) {
-                ChessMessage message = (ChessMessage) ois.readObject();
+                ChessMessage message = (ChessMessage) inputStream.readObject();
                 processMessage(message);
             }
         } catch (IOException | ClassNotFoundException e) {
-            handleDisconnection();
+            if (connected) {  // Only handle as error if we didn't intentionally disconnect
+                System.err.println("Error in message listener: " + e.getMessage());
+                handleDisconnection();
+            }
         }
     }
 
+    /**
+     * Handles unexpected disconnection from the server.
+     */
     private void handleDisconnection() {
         disconnect();
         SwingUtilities.invokeLater(() -> {
@@ -61,42 +95,91 @@ public class ChessGameClient {
         });
     }
 
+    /**
+     * Processes incoming messages and updates the game state.
+     */
     private void processMessage(ChessMessage message) {
-        System.out.println("Message received: " + message.type() + ' ' + message.data().toString());
+        System.out.println("Message received: " + message.type() + " from player " + message.playerID());
 
         switch (message.type()) {
-            case ChessMessage.START -> {
-                playerID = (int) message.data();
-                System.out.println("Game started. You are " + (playerID == 1 ? "White" : "Black"));
-                game.start(playerID);
-            }
-            case ChessMessage.MOVE -> {
-                int[] move = (int[]) message.data();
-                game.makeMove(message.playerID(), ChessGame.BOARD_SIZE - move[0] - 1, move[1],
-                        ChessGame.BOARD_SIZE - move[2] - 1, move[3]);
-                game.getGUI().repaint();
-            }
-            case ChessMessage.CHECKMATE -> game.getGUI().checkmate((int) message.data());
+            case ChessMessage.START -> handleStartMessage(message);
+            case ChessMessage.MOVE -> handleMoveMessage(message);
+            case ChessMessage.CHECKMATE -> handleCheckmateMessage(message);
             case ChessMessage.QUIT -> handleOpponentDisconnection();
-            case ChessMessage.PLACE -> {
-                int[] move = (int[]) message.data();
-                Chess piece;
-                switch (move[1]) {
-                    case 2 -> piece = new Bishop(message.playerID());
-                    case 1 -> piece = new Knight(message.playerID());
-                    case 3 -> piece = new Rook(message.playerID());
-                    default -> piece = new Queen(message.playerID());
-                }
-                if (move[0] == 1) {
-                    game.getBoard()[game.getBoard().length - move[2] - 1][move[3]] = piece;
-                } else {
-                    game.getBoard()[move[2]][move[3]] = null;
-                }
-                game.getGUI().repaint();
-            }
+            case ChessMessage.PLACE -> handlePlacePieceMessage(message);
         }
     }
 
+    /**
+     * Handles the START message, which assigns player ID.
+     */
+    private void handleStartMessage(ChessMessage message) {
+        playerID = (int) message.data();
+        System.out.println("Game started. You are " + (playerID == 1 ? "White" : "Black"));
+        game.start(playerID);
+    }
+
+    /**
+     * Handles a MOVE message from the opponent.
+     */
+    private void handleMoveMessage(ChessMessage message) {
+        int[] move = (int[]) message.data();
+        
+        // Invert board coordinates for opponent's move
+        game.makeMove(
+            message.playerID(),
+            ChessGame.BOARD_SIZE - move[0] - 1,
+            move[1],
+            ChessGame.BOARD_SIZE - move[2] - 1,
+            move[3]
+        );
+        game.getGUI().repaint();
+    }
+
+    /**
+     * Handles a CHECKMATE message.
+     */
+    private void handleCheckmateMessage(ChessMessage message) {
+        game.getGUI().checkmate((int) message.data());
+    }
+
+    /**
+     * Handles placing a piece on the board (for promotions).
+     */
+    private void handlePlacePieceMessage(ChessMessage message) {
+        int[] moveData = (int[]) message.data();
+        int pieceType = moveData[1];
+        int row = moveData[2];
+        int col = moveData[3];
+        
+        // Create appropriate piece based on the type code
+        Chess piece = createPieceFromCode(pieceType, message.playerID());
+        
+        // Check if placing (1) or removing (0) a piece
+        if (moveData[0] == 1) {
+            game.getBoard()[ChessGame.BOARD_SIZE - row - 1][col] = piece;
+        } else {
+            game.getBoard()[row][col] = null;
+        }
+        
+        game.getGUI().repaint();
+    }
+
+    /**
+     * Creates a chess piece based on type code.
+     */
+    private Chess createPieceFromCode(int pieceCode, int playerColor) {
+        return switch (pieceCode) {
+            case 2 -> new Bishop(playerColor);
+            case 1 -> new Knight(playerColor);
+            case 3 -> new Rook(playerColor);
+            default -> new Queen(playerColor);
+        };
+    }
+
+    /**
+     * Handles the opponent disconnecting from the game.
+     */
     private void handleOpponentDisconnection() {
         SwingUtilities.invokeLater(() -> {
             int option = JOptionPane.showOptionDialog(null,
@@ -118,22 +201,30 @@ public class ChessGameClient {
         });
     }
 
+    /**
+     * Sends a move to the opponent.
+     */
     public void sendMove(int type, int[] move) {
         try {
             if (connected) {
-                oos.writeObject(new ChessMessage(type, playerID, move));
+                outputStream.writeObject(new ChessMessage(type, playerID, move));
             }
         } catch (IOException e) {
+            System.err.println("Error sending move: " + e.getMessage());
             handleDisconnection();
         }
     }
 
+    /**
+     * Sends a checkmate notification.
+     */
     public void sendCheckMate() {
         try {
             if (connected) {
-                oos.writeObject(new ChessMessage(ChessMessage.CHECKMATE, 0, playerID));
+                outputStream.writeObject(new ChessMessage(ChessMessage.CHECKMATE, 0, playerID));
             }
         } catch (IOException e) {
+            System.err.println("Error sending checkmate: " + e.getMessage());
             handleDisconnection();
         }
     }
